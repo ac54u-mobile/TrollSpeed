@@ -26,7 +26,7 @@ open class SPLarkSettingsCollectionView: UICollectionView {
     
     let layout = UICollectionViewFlowLayout()
     let cellIdentificator: String = "SPLarkSettingsCollectionViewCell"
-    var cellSize: CGSize = CGSize.init(width: 156, height: 60)
+    var cellSize: CGSize = CGSize.init(width: 320, height: 68)
     var sideInset: CGFloat = 27
     
     required public init?(coder aDecoder: NSCoder) {
@@ -52,12 +52,14 @@ open class SPLarkSettingsCollectionView: UICollectionView {
         self.showsHorizontalScrollIndicator = false
         self.showsVerticalScrollIndicator = false
         
-        self.layout.scrollDirection = .horizontal
-        self.layout.minimumLineSpacing = 19 / 2
-        self.layout.minimumInteritemSpacing = 19 / 2
-        self.contentInset = UIEdgeInsets.init(top: 0, left: self.sideInset, bottom: 0, right: self.sideInset)
+        self.layout.scrollDirection = .vertical
+        self.layout.minimumLineSpacing = 10
+        self.layout.minimumInteritemSpacing = 0
+        self.layout.sectionInset = UIEdgeInsets(top: 6, left: self.sideInset, bottom: 18, right: self.sideInset)
+        self.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 28, right: 0)
         
         self.register(SPLarkSettingsCollectionViewCell.self, forCellWithReuseIdentifier: self.cellIdentificator)
+        self.register(SPLarkSettingsSectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "SPLarkSettingsSectionHeader")
     }
     
     func dequeueCell(indexPath: IndexPath) -> SPLarkSettingsCollectionViewCell {
@@ -65,7 +67,9 @@ open class SPLarkSettingsCollectionView: UICollectionView {
     }
     
     func layout(y: CGFloat) {
-        self.frame = CGRect.init(x: 0, y: y, width: (self.superview?.frame.width ?? 0), height: self.cellSize.height * 2 + self.layout.minimumInteritemSpacing)
-        self.layout.itemSize = self.cellSize
+        let width = self.superview?.frame.width ?? 0
+        let height = max(0, (self.superview?.frame.height ?? 0) - y)
+        self.frame = CGRect(x: 0, y: y, width: width, height: height)
+        self.layout.itemSize = CGSize(width: max(0, width - self.sideInset * 2), height: self.cellSize.height)
     }
 }

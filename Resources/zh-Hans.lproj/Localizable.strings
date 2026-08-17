@@ -100,6 +100,9 @@
 "HUD Preview" = "悬浮窗预览";
 "FPS preview" = "帧率预览";
 "Network speed preview" = "网速预览";
+"Monitor" = "监测内容";
+"Behavior" = "悬浮行为";
+"Data Format" = "数据格式";
 
 /* No comment provided by engineer. */
 "Hide @snapshot" = "截图时隐藏";

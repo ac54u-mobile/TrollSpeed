@@ -100,9 +100,12 @@
 "HUD Preview" = "HUD Preview";
 "FPS preview" = "FPS preview";
 "Network speed preview" = "Network speed preview";
+"Monitor" = "MONITOR";
+"Behavior" = "BEHAVIOR";
+"Data Format" = "DATA FORMAT";
 
 /* No comment provided by engineer. */
-"Hide @snapshot" = "Hide @snapshot";
+"Hide @snapshot" = "Hide in Screenshots";
 
 /* No comment provided by engineer. */
 "Incoming Only" = "Incoming Only";
@@ -111,7 +114,7 @@
 "Inverted" = "Inverted";
 
 /* No comment provided by engineer. */
-"Keep In-place" = "Keep In-place";
+"Keep In-place" = "Lock Position";
 
 /* No comment provided by engineer. */
 "Landscape" = "Landscape";
@@ -135,10 +138,10 @@
 "Open HUD" = "Open HUD";
 
 /* No comment provided by engineer. */
-"Pass-through" = "Pass-through";
+"Pass-through" = "Touch Through";
 
 /* No comment provided by engineer. */
-"Prefixes" = "Prefixes";
+"Prefixes" = "Direction Symbols";
 
 /* No comment provided by engineer. */
 "Re-open to apply" = "Re-open to apply";
@@ -168,7 +171,7 @@
 "Toggle the network speed HUD." = "Toggle the network speed HUD.";
 
 /* No comment provided by engineer. */
-"Unit" = "Unit";
+"Unit" = "Transfer Unit";
 
 /* No comment provided by engineer. */
 "Utility" = "Utility";

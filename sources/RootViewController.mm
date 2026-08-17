@@ -101,7 +101,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
 
     _titleLabel = [[UILabel alloc] init];
     _titleLabel.text = @"TrollSpeed";
-    _titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleLargeTitle];
+    _titleLabel.font = [UIFont systemFontOfSize:38.0 weight:UIFontWeightBold];
     _titleLabel.adjustsFontForContentSizeCategory = YES;
     _titleLabel.textColor = [UIColor labelColor];
     _titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -118,9 +118,9 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     [_subtitleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self.backgroundView addSubview:_subtitleLabel];
 
-    UIBlurEffect *previewEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterial];
+    UIBlurEffect *previewEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
     _previewCard = [[UIVisualEffectView alloc] initWithEffect:previewEffect];
-    _previewCard.layer.cornerRadius = 22.0;
+    _previewCard.layer.cornerRadius = 26.0;
     _previewCard.layer.cornerCurve = kCACornerCurveContinuous;
     _previewCard.clipsToBounds = YES;
     _previewCard.accessibilityLabel = NSLocalizedString(@"HUD Preview", nil);
@@ -136,7 +136,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     [_previewCard.contentView addSubview:_previewTitleLabel];
 
     _previewValueLabel = [[UILabel alloc] init];
-    _previewValueLabel.font = [UIFont monospacedDigitSystemFontOfSize:17.0 weight:UIFontWeightSemibold];
+    _previewValueLabel.font = [UIFont monospacedDigitSystemFontOfSize:20.0 weight:UIFontWeightBold];
     _previewValueLabel.textColor = [UIColor labelColor];
     _previewValueLabel.textAlignment = NSTextAlignmentCenter;
     [_previewValueLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -157,7 +157,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
         [_previewCard.widthAnchor constraintGreaterThanOrEqualToConstant:280.0f],
         [_previewCard.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.backgroundView.safeAreaLayoutGuide.leadingAnchor constant:24.0f],
         [_previewCard.trailingAnchor constraintLessThanOrEqualToAnchor:self.backgroundView.safeAreaLayoutGuide.trailingAnchor constant:-24.0f],
-        [_previewCard.heightAnchor constraintGreaterThanOrEqualToConstant:126.0f],
+        [_previewCard.heightAnchor constraintGreaterThanOrEqualToConstant:138.0f],
         [_previewTitleLabel.topAnchor constraintEqualToAnchor:_previewCard.contentView.topAnchor constant:14.0f],
         [_previewTitleLabel.centerXAnchor constraintEqualToAnchor:_previewCard.contentView.centerXAnchor],
         [_previewValueLabel.topAnchor constraintEqualToAnchor:_previewTitleLabel.bottomAnchor constant:6.0f],
@@ -361,12 +361,12 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
 - (void)updateVisualStyle
 {
     UIColor *topColor = [UIColor systemBackgroundColor];
-    UIColor *accentColor = [[UIColor systemTealColor] colorWithAlphaComponent:(self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? 0.28 : 0.18)];
+    UIColor *accentColor = [[UIColor systemIndigoColor] colorWithAlphaComponent:(self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? 0.32 : 0.16)];
     _backgroundGradient.colors = @[(id)topColor.CGColor, (id)accentColor.CGColor];
 
     NSArray<UIButton *> *positionButtons = @[_topLeftButton, _topCenterButton, _topRightButton];
     for (UIButton *button in positionButtons) {
-        UIColor *backgroundColor = button.isSelected ? [UIColor systemTealColor] : [UIColor tertiarySystemFillColor];
+        UIColor *backgroundColor = button.isSelected ? [UIColor systemIndigoColor] : [UIColor tertiarySystemFillColor];
         UIColor *foregroundColor = button.isSelected ? [UIColor whiteColor] : [UIColor labelColor];
         if (@available(iOS 15.0, *)) {
             UIButtonConfiguration *configuration = button.configuration;
@@ -764,7 +764,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
         __strong typeof(weakSelf) strongSelf = weakSelf;
         NSString *mainTitle = strongSelf->_isRemoteHUDActive ? NSLocalizedString(@"Exit HUD", nil) : NSLocalizedString(@"Open HUD", nil);
         UIImage *mainImage = [UIImage systemImageNamed:(strongSelf->_isRemoteHUDActive ? @"stop.fill" : @"play.fill")];
-        UIColor *mainColor = strongSelf->_isRemoteHUDActive ? [UIColor systemRedColor] : [UIColor systemTealColor];
+        UIColor *mainColor = strongSelf->_isRemoteHUDActive ? [UIColor systemRedColor] : [UIColor systemIndigoColor];
         if (@available(iOS 15.0, *)) {
             UIButtonConfiguration *configuration = strongSelf->_mainButton.configuration;
             configuration.title = mainTitle;
@@ -921,6 +921,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     settingsViewController.alreadyLaunched = _isRemoteHUDActive;
 
     SPLarkTransitioningDelegate *transitioningDelegate = [[SPLarkTransitioningDelegate alloc] init];
+    transitioningDelegate.customHeight = MIN(CGRectGetHeight(self.view.bounds) * 0.84, 760.0);
     settingsViewController.transitioningDelegate = transitioningDelegate;
     settingsViewController.modalPresentationStyle = UIModalPresentationCustom;
     settingsViewController.modalPresentationCapturesStatusBarAppearance = YES;

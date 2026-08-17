@@ -100,6 +100,9 @@
 "HUD Preview" = "Vista previa del HUD";
 "FPS preview" = "Vista previa de FPS";
 "Network speed preview" = "Vista previa de velocidad de red";
+"Monitor" = "MONITOR";
+"Behavior" = "COMPORTAMIENTO";
+"Data Format" = "FORMATO DE DATOS";
 
 /* No comment provided by engineer. */
 "Hide @snapshot" = "Ocultar en capturas";

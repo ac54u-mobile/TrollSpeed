@@ -21,6 +21,27 @@
 
 import UIKit
 
+final class SPLarkSettingsSectionHeader: UICollectionReusableView {
+    let titleLabel = UILabel()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        titleLabel.font = UIFont.preferredFont(forTextStyle: .caption1)
+        titleLabel.adjustsFontForContentSizeCategory = true
+        titleLabel.textColor = .secondaryLabel
+        addSubview(titleLabel)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        titleLabel.frame = bounds.insetBy(dx: 27, dy: 0)
+    }
+}
+
 @available(iOS 8.2, *)
 open class SPLarkSettingsController: UIViewController {
     
@@ -33,6 +54,12 @@ open class SPLarkSettingsController: UIViewController {
     open func settingsCount() -> Int {
         fatalError("SPLarkSettingsController - Need implement function")
     }
+
+    open func settingsSectionCount() -> Int { return 1 }
+    open func settingsCount(section: Int) -> Int { return section == 0 ? settingsCount() : 0 }
+    open func settingIndex(indexPath: IndexPath) -> Int { return indexPath.row }
+    open func settingSectionTitle(section: Int) -> String? { return nil }
+    open func settingIconName(index: Int) -> String { return "slider.horizontal.3" }
     
     open func settingTitle(index: Int, highlighted: Bool) -> String {
         fatalError("SPLarkSettingsController - Need implement function")
@@ -66,9 +93,10 @@ open class SPLarkSettingsController: UIViewController {
         super.viewDidLoad()
         
         self.titleLabel.text = NSLocalizedString("Settings", comment: "")
-        self.titleLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
+        self.titleLabel.font = UIFont.preferredFont(forTextStyle: .largeTitle)
+        self.titleLabel.adjustsFontForContentSizeCategory = true
         self.titleLabel.textAlignment = .left
-        self.titleLabel.textColor = UIColor.white
+        self.titleLabel.textColor = UIColor.label
         self.titleLabel.numberOfLines = 0
         self.view.addSubview(self.titleLabel)
         
@@ -84,8 +112,8 @@ open class SPLarkSettingsController: UIViewController {
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self.titleLabel.sizeToFit()
-        self.titleLabel.frame = CGRect.init(x: 27, y: 40, width: self.view.frame.width - 27 * 2, height: self.titleLabel.frame.height)
-        self.collectionView.layout(y: self.titleLabel.frame.origin.y + self.titleLabel.frame.height + 24)
+        self.titleLabel.frame = CGRect.init(x: 27, y: 36, width: self.view.frame.width - 27 * 2, height: self.titleLabel.frame.height)
+        self.collectionView.layout(y: self.titleLabel.frame.origin.y + self.titleLabel.frame.height + 14)
         self.closeButton.layout(bottomX: self.view.frame.width - 19, y: self.titleLabel.frame.origin.y + self.titleLabel.frame.height / 2 - self.closeButton.frame.height / 2 - 2)
     }
     
@@ -96,11 +124,15 @@ open class SPLarkSettingsController: UIViewController {
 
 @available(iOS 8.2, *)
 extension SPLarkSettingsController: UICollectionViewDataSource, UICollectionViewDelegate {
+
+    open func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return collectionView === self.collectionView ? settingsSectionCount() : 0
+    }
     
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch collectionView {
         case self.collectionView:
-            return self.settingsCount()
+            return self.settingsCount(section: section)
         default:
             return 0
         }
@@ -110,13 +142,19 @@ extension SPLarkSettingsController: UICollectionViewDataSource, UICollectionView
         switch collectionView {
         case self.collectionView:
             let cell = self.collectionView.dequeueCell(indexPath: indexPath)
-            let highlighted = self.settingHighlighted(index: indexPath.row)
-            let enabled = self.settingEnabled(index: indexPath.row)
-            cell.titleLabel.text = self.settingTitle(index: indexPath.row, highlighted: highlighted)
-            cell.subtitleLabel.text = self.settingSubtitle(index: indexPath.row, highlighted: highlighted)
+            let index = settingIndex(indexPath: indexPath)
+            let highlighted = self.settingHighlighted(index: index)
+            let enabled = self.settingEnabled(index: index)
+            cell.titleLabel.text = self.settingTitle(index: index, highlighted: highlighted)
+            cell.subtitleLabel.text = self.settingSubtitle(index: index, highlighted: highlighted)
+            cell.setIcon(self.settingIconName(index: index))
+            cell.isAccessibilityElement = true
+            cell.accessibilityTraits = enabled ? .button : [.button, .notEnabled]
+            cell.accessibilityLabel = cell.titleLabel.text
+            cell.accessibilityValue = cell.subtitleLabel.text
             cell.setHighlighted(
                 highlighted,
-                color: highlighted ? self.settingColorHighlighted(index: indexPath.row) : UIColor.white.withAlphaComponent(0.1)
+                color: highlighted ? self.settingColorHighlighted(index: index) : UIColor.secondarySystemGroupedBackground
             )
             cell.setEnabled(enabled)
             return cell
@@ -124,16 +162,24 @@ extension SPLarkSettingsController: UICollectionViewDataSource, UICollectionView
             return UICollectionViewCell()
         }
     }
+
+    open func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "SPLarkSettingsSectionHeader", for: indexPath) as! SPLarkSettingsSectionHeader
+        header.titleLabel.text = settingSectionTitle(section: indexPath.section)?.uppercased()
+        return header
+    }
     
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let cell = collectionView.cellForItem(at: indexPath) as? SPLarkSettingsCollectionViewCell {
-            self.settingDidSelect(index: indexPath.row) {
-                let highlighted = self.settingHighlighted(index: indexPath.row)
-                cell.titleLabel.text = self.settingTitle(index: indexPath.row, highlighted: highlighted)
-                cell.subtitleLabel.text = self.settingSubtitle(index: indexPath.row, highlighted: highlighted)
+            let index = settingIndex(indexPath: indexPath)
+            self.settingDidSelect(index: index) {
+                let highlighted = self.settingHighlighted(index: index)
+                cell.titleLabel.text = self.settingTitle(index: index, highlighted: highlighted)
+                cell.subtitleLabel.text = self.settingSubtitle(index: index, highlighted: highlighted)
+                cell.accessibilityValue = cell.subtitleLabel.text
                 cell.setHighlighted(
                     highlighted,
-                    color: highlighted ? self.settingColorHighlighted(index: indexPath.row) : UIColor.white.withAlphaComponent(0.1)
+                    color: highlighted ? self.settingColorHighlighted(index: index) : UIColor.secondarySystemGroupedBackground
                 )
             }
         }

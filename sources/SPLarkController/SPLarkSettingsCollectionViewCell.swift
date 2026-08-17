@@ -27,10 +27,12 @@ public class SPLarkSettingsCollectionViewCell: UICollectionViewCell {
     let titleLabel = UILabel()
     let subtitleLabel = UILabel()
     let backgroundColorView = UIView()
+    let iconBackgroundView = UIView()
+    let iconImageView = UIImageView()
 
-    private static let pressDownScale: CGFloat = 0.92
-    private static let animationDuration: TimeInterval = 0.4
-    private static let animationDamping: CGFloat = 0.6
+    private static let pressDownScale: CGFloat = 0.975
+    private static let animationDuration: TimeInterval = 0.28
+    private static let animationDamping: CGFloat = 0.86
 
     private func animatePress() {
         UIView.animate(withDuration: Self.animationDuration, delay: 0, usingSpringWithDamping: Self.animationDamping, initialSpringVelocity: 0, options: [.curveEaseOut, .beginFromCurrentState, .allowUserInteraction], animations: {
@@ -73,27 +75,46 @@ public class SPLarkSettingsCollectionViewCell: UICollectionViewCell {
         self.backgroundColor = .clear
 
         self.backgroundColorView.layer.masksToBounds = true
-        self.backgroundColorView.layer.cornerRadius = 13
+        self.backgroundColorView.layer.cornerRadius = 18
+        self.backgroundColorView.layer.cornerCurve = .continuous
         self.contentView.addSubview(self.backgroundColorView)
 
-        self.titleLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        self.titleLabel.numberOfLines = 0
+        self.iconBackgroundView.layer.cornerRadius = 11
+        self.iconBackgroundView.layer.cornerCurve = .continuous
+        self.iconBackgroundView.backgroundColor = UIColor.systemIndigo.withAlphaComponent(0.12)
+        self.contentView.addSubview(self.iconBackgroundView)
+
+        self.iconImageView.contentMode = .scaleAspectFit
+        self.iconImageView.tintColor = .systemIndigo
+        self.iconImageView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 17, weight: .semibold)
+        self.iconBackgroundView.addSubview(self.iconImageView)
+
+        self.titleLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        self.titleLabel.adjustsFontForContentSizeCategory = true
+        self.titleLabel.numberOfLines = 1
         self.titleLabel.textAlignment = .left
         self.titleLabel.baselineAdjustment = .alignBaselines
-        self.titleLabel.textColor = UIColor.white
+        self.titleLabel.textColor = UIColor.label
         self.titleLabel.text = "Title"
         self.contentView.addSubview(self.titleLabel)
         
-        self.subtitleLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        self.subtitleLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        self.subtitleLabel.adjustsFontForContentSizeCategory = true
         self.subtitleLabel.numberOfLines = 1
-        self.subtitleLabel.textAlignment = .left
-        self.subtitleLabel.textColor = UIColor.white
+        self.subtitleLabel.textAlignment = .right
+        self.subtitleLabel.textColor = UIColor.secondaryLabel
         self.subtitleLabel.text = "Subtitle"
         self.contentView.addSubview(self.subtitleLabel)
     }
     
     func setHighlighted(_ state: Bool, color: UIColor) {
-        self.backgroundColorView.backgroundColor = color
+        self.backgroundColorView.backgroundColor = state ? color.withAlphaComponent(0.18) : UIColor.secondarySystemGroupedBackground
+        self.iconBackgroundView.backgroundColor = state ? color.withAlphaComponent(0.22) : UIColor.systemIndigo.withAlphaComponent(0.12)
+        self.iconImageView.tintColor = state ? color : UIColor.systemIndigo
+    }
+
+    func setIcon(_ systemName: String) {
+        self.iconImageView.image = UIImage(systemName: systemName)
     }
     
     func setEnabled(_ enabled: Bool) {
@@ -107,6 +128,7 @@ public class SPLarkSettingsCollectionViewCell: UICollectionViewCell {
         self.isUserInteractionEnabled = true
         self.titleLabel.text = "Title"
         self.subtitleLabel.text = "Subtitle"
+        self.iconImageView.image = nil
         self.layoutSubviews()
     }
     
@@ -115,31 +137,14 @@ public class SPLarkSettingsCollectionViewCell: UICollectionViewCell {
 
         self.backgroundColorView.frame = self.contentView.bounds
         
-        if self.subtitleLabel.text == nil {
-            let topInset: CGFloat = 19 / 2
-            let sideInset: CGFloat = 19 / 1.5
-            
-            self.titleLabel.sizeToFit()
-            self.titleLabel.frame = CGRect.init(
-                x: sideInset,
-                y: topInset,
-                width: self.contentView.frame.width - sideInset * 2,
-                height: self.contentView.frame.height - topInset * 2
-            )
-        } else {
-            let topInset: CGFloat = 19 / 2
-            let sideInset: CGFloat = 19 / 1.5
-            
-            self.subtitleLabel.sizeToFit()
-            self.subtitleLabel.frame.origin.x = sideInset
-            self.subtitleLabel.frame = CGRect.init(x: self.subtitleLabel.frame.origin.x, y: self.subtitleLabel.frame.origin.y, width: self.contentView.frame.width - sideInset * 2, height: self.subtitleLabel.frame.height)
-            self.subtitleLabel.frame.origin.y = self.contentView.frame.height - topInset * 1.2 - self.subtitleLabel.frame.height
-            
-            self.titleLabel.sizeToFit()
-            self.titleLabel.frame = CGRect.init(x: self.titleLabel.frame.origin.x, y: self.titleLabel.frame.origin.y, width: self.contentView.frame.width - sideInset * 2, height: self.subtitleLabel.frame.origin.y - topInset - topInset / 2)
-            
-            self.titleLabel.frame.origin.x = sideInset
-            self.titleLabel.frame.origin.y = topInset * 1.3
-        }
+        let iconSize: CGFloat = 42
+        let sideInset: CGFloat = 13
+        self.iconBackgroundView.frame = CGRect(x: sideInset, y: (bounds.height - iconSize) / 2, width: iconSize, height: iconSize)
+        self.iconImageView.frame = self.iconBackgroundView.bounds.insetBy(dx: 10, dy: 10)
+        self.subtitleLabel.sizeToFit()
+        let subtitleWidth = min(self.subtitleLabel.bounds.width, bounds.width * 0.32)
+        self.subtitleLabel.frame = CGRect(x: bounds.width - sideInset - subtitleWidth, y: 0, width: subtitleWidth, height: bounds.height)
+        let titleX = self.iconBackgroundView.frame.maxX + 13
+        self.titleLabel.frame = CGRect(x: titleX, y: 0, width: max(0, self.subtitleLabel.frame.minX - titleX - 12), height: bounds.height)
     }
 }
