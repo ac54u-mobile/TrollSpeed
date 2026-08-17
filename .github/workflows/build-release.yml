@@ -61,13 +61,28 @@ jobs:
           echo "PKG_VERSION=$(./get-version.sh)" >> $GITHUB_ENV
 
       - name: Build package
+        shell: bash
         run: |
+          set -o pipefail
           cd $GITHUB_WORKSPACE/TrollSpeed
           ./gen-control.sh
-          ./build.sh
-          THEOS_PACKAGE_SCHEME=roothide FINALPACKAGE=1 gmake clean package
-          THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1 gmake clean package
-          FINALPACKAGE=1 gmake clean package
+
+          run_logged() {
+            local label="$1"
+            shift
+            if ! "$@" >"${label}.log" 2>&1; then
+              tail -100 "${label}.log"
+              summary=$(tail -30 "${label}.log" | tr '\n' ' ' | sed 's/%/%25/g; s/\r/%0D/g')
+              echo "::error title=${label} build failed::${summary}"
+              return 1
+            fi
+            tail -30 "${label}.log"
+          }
+
+          run_logged appintents ./build.sh
+          run_logged roothide env THEOS_PACKAGE_SCHEME=roothide FINALPACKAGE=1 gmake clean package
+          run_logged rootless env THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1 gmake clean package
+          run_logged rootful env FINALPACKAGE=1 gmake clean package
 
       - name: Collect symbols
         run: |
