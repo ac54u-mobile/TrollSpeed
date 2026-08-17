@@ -1,3 +1,6 @@
-# Bug Fixes
+# TrollSpeed 2.1-14
 
-- Fix a bug in App Intents.
+- 全新深色蓝绿渐变应用图标，同时适配 Xcode 与 Theos/TrollStore 安装包。
+- 首页加入悬浮窗效果预览，可直接在网速与 FPS 模式间快速切换。
+- 设置入口升级为更清晰的胶囊按钮，并兼容 iOS 14–18。
+- 增补简体中文、英文和西班牙语的预览辅助功能文案。
