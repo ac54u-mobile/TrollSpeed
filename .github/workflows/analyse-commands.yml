@@ -81,3 +81,12 @@ jobs:
 
           build_package rootless env THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1 gmake clean package
           build_package rootful env FINALPACKAGE=1 gmake clean package
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrollSpeed-${{ github.sha }}
+          if-no-files-found: error
+          path: |
+            TrollSpeed/packages/*.tipa
+            TrollSpeed/packages/*.deb
