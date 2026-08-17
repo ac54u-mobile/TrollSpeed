@@ -97,6 +97,9 @@
 "Inactive" = "Inactivo";
 "HUD is active" = "El HUD está activo";
 "HUD is inactive" = "El HUD está inactivo";
+"HUD Preview" = "Vista previa del HUD";
+"FPS preview" = "Vista previa de FPS";
+"Network speed preview" = "Vista previa de velocidad de red";
 
 /* No comment provided by engineer. */
 "Hide @snapshot" = "Ocultar en capturas";

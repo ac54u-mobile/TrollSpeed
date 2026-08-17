@@ -97,6 +97,9 @@
 "Inactive" = "Inactive";
 "HUD is active" = "HUD is active";
 "HUD is inactive" = "HUD is inactive";
+"HUD Preview" = "HUD Preview";
+"FPS preview" = "FPS preview";
+"Network speed preview" = "Network speed preview";
 
 /* No comment provided by engineer. */
 "Hide @snapshot" = "Hide @snapshot";

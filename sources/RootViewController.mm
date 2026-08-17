@@ -37,6 +37,10 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     UILabel *_subtitleLabel;
     UILabel *_statusLabel;
     UIView *_statusIndicator;
+    UIVisualEffectView *_previewCard;
+    UILabel *_previewTitleLabel;
+    UILabel *_previewValueLabel;
+    UISegmentedControl *_displayModeControl;
     CAGradientLayer *_backgroundGradient;
     BOOL _supportsCenterMost;
     NSLayoutConstraint *_topLeftConstraint;
@@ -113,6 +117,58 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     _subtitleLabel.numberOfLines = 2;
     [_subtitleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self.backgroundView addSubview:_subtitleLabel];
+
+    UIBlurEffect *previewEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterial];
+    _previewCard = [[UIVisualEffectView alloc] initWithEffect:previewEffect];
+    _previewCard.layer.cornerRadius = 22.0;
+    _previewCard.layer.cornerCurve = kCACornerCurveContinuous;
+    _previewCard.clipsToBounds = YES;
+    _previewCard.accessibilityLabel = NSLocalizedString(@"HUD Preview", nil);
+    [_previewCard setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.backgroundView addSubview:_previewCard];
+
+    _previewTitleLabel = [[UILabel alloc] init];
+    _previewTitleLabel.text = NSLocalizedString(@"HUD Preview", nil);
+    _previewTitleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption1];
+    _previewTitleLabel.adjustsFontForContentSizeCategory = YES;
+    _previewTitleLabel.textColor = [UIColor secondaryLabelColor];
+    [_previewTitleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [_previewCard.contentView addSubview:_previewTitleLabel];
+
+    _previewValueLabel = [[UILabel alloc] init];
+    _previewValueLabel.font = [UIFont monospacedDigitSystemFontOfSize:17.0 weight:UIFontWeightSemibold];
+    _previewValueLabel.textColor = [UIColor labelColor];
+    _previewValueLabel.textAlignment = NSTextAlignmentCenter;
+    [_previewValueLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [_previewCard.contentView addSubview:_previewValueLabel];
+
+    _displayModeControl = [[UISegmentedControl alloc] initWithItems:@[
+        NSLocalizedString(@"Speed", nil),
+        NSLocalizedString(@"FPS", nil),
+    ]];
+    _displayModeControl.selectedSegmentIndex = [self displayMode] ? 1 : 0;
+    _displayModeControl.accessibilityLabel = NSLocalizedString(@"Display Mode", nil);
+    [_displayModeControl addTarget:self action:@selector(displayModeChanged:) forControlEvents:UIControlEventValueChanged];
+    [_displayModeControl setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [_previewCard.contentView addSubview:_displayModeControl];
+
+    [NSLayoutConstraint activateConstraints:@[
+        [_previewCard.centerXAnchor constraintEqualToAnchor:self.backgroundView.safeAreaLayoutGuide.centerXAnchor],
+        [_previewCard.widthAnchor constraintGreaterThanOrEqualToConstant:280.0f],
+        [_previewCard.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.backgroundView.safeAreaLayoutGuide.leadingAnchor constant:24.0f],
+        [_previewCard.trailingAnchor constraintLessThanOrEqualToAnchor:self.backgroundView.safeAreaLayoutGuide.trailingAnchor constant:-24.0f],
+        [_previewCard.heightAnchor constraintGreaterThanOrEqualToConstant:126.0f],
+        [_previewTitleLabel.topAnchor constraintEqualToAnchor:_previewCard.contentView.topAnchor constant:14.0f],
+        [_previewTitleLabel.centerXAnchor constraintEqualToAnchor:_previewCard.contentView.centerXAnchor],
+        [_previewValueLabel.topAnchor constraintEqualToAnchor:_previewTitleLabel.bottomAnchor constant:6.0f],
+        [_previewValueLabel.centerXAnchor constraintEqualToAnchor:_previewCard.contentView.centerXAnchor],
+        [_displayModeControl.topAnchor constraintEqualToAnchor:_previewValueLabel.bottomAnchor constant:12.0f],
+        [_displayModeControl.leadingAnchor constraintEqualToAnchor:_previewCard.contentView.leadingAnchor constant:14.0f],
+        [_displayModeControl.trailingAnchor constraintEqualToAnchor:_previewCard.contentView.trailingAnchor constant:-14.0f],
+        [_displayModeControl.bottomAnchor constraintEqualToAnchor:_previewCard.contentView.bottomAnchor constant:-14.0f],
+    ]];
+
+    [self updatePreviewContent];
 
     _topLeftButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_topLeftButton setTintColor:[UIColor whiteColor]];
@@ -257,7 +313,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
         [_titleLabel.bottomAnchor constraintEqualToAnchor:_subtitleLabel.topAnchor constant:-6.0f],
         [_titleLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:safeArea.leadingAnchor constant:24.0f],
         [_subtitleLabel.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor],
-        [_subtitleLabel.bottomAnchor constraintEqualToAnchor:_mainButton.topAnchor constant:-40.0f],
+        [_subtitleLabel.bottomAnchor constraintEqualToAnchor:_previewCard.topAnchor constant:-16.0f],
         [_subtitleLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:safeArea.leadingAnchor constant:24.0f],
         [_subtitleLabel.trailingAnchor constraintLessThanOrEqualToAnchor:safeArea.trailingAnchor constant:-24.0f],
         [_statusIndicator.widthAnchor constraintEqualToConstant:8.0f],
@@ -266,9 +322,10 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
         [_statusIndicator.trailingAnchor constraintEqualToAnchor:_statusLabel.leadingAnchor constant:-8.0f],
         [_statusLabel.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor constant:8.0f],
         [_statusLabel.topAnchor constraintEqualToAnchor:_mainButton.bottomAnchor constant:16.0f],
+        [_previewCard.bottomAnchor constraintEqualToAnchor:_mainButton.topAnchor constant:-20.0f],
         [_settingsButton.bottomAnchor constraintEqualToAnchor:safeArea.bottomAnchor constant:-20.0f],
         [_settingsButton.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor],
-        [_settingsButton.widthAnchor constraintEqualToConstant:44.0f],
+        [_settingsButton.widthAnchor constraintGreaterThanOrEqualToConstant:116.0f],
         [_settingsButton.heightAnchor constraintEqualToConstant:44.0f],
     ]];
 
@@ -326,15 +383,37 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
 
     if (@available(iOS 15.0, *)) {
         UIButtonConfiguration *configuration = _settingsButton.configuration;
+        configuration.title = NSLocalizedString(@"Settings", nil);
+        configuration.image = [UIImage systemImageNamed:@"gearshape.fill"];
+        configuration.imagePadding = 8.0;
         configuration.baseBackgroundColor = [UIColor tertiarySystemFillColor];
         configuration.baseForegroundColor = [UIColor labelColor];
         _settingsButton.configuration = configuration;
     } else {
+        [_settingsButton setTitle:NSLocalizedString(@"Settings", nil) forState:UIControlStateNormal];
+        [_settingsButton setImage:[UIImage systemImageNamed:@"gearshape.fill"] forState:UIControlStateNormal];
+        _settingsButton.imageEdgeInsets = UIEdgeInsetsMake(0.0, -4.0, 0.0, 4.0);
+        _settingsButton.titleEdgeInsets = UIEdgeInsetsMake(0.0, 4.0, 0.0, -4.0);
         _settingsButton.backgroundColor = [UIColor tertiarySystemFillColor];
         _settingsButton.tintColor = [UIColor labelColor];
     }
     _settingsButton.layer.cornerRadius = 22.0;
     _settingsButton.layer.cornerCurve = kCACornerCurveContinuous;
+}
+
+- (void)updatePreviewContent
+{
+    BOOL showsFPS = (_displayModeControl.selectedSegmentIndex == 1);
+    _previewValueLabel.text = showsFPS ? @"60 FPS" : @"↓ 233 KB/s   ↑ 128 KB/s";
+    _previewCard.accessibilityValue = showsFPS ? NSLocalizedString(@"FPS preview", nil) : NSLocalizedString(@"Network speed preview", nil);
+}
+
+- (void)displayModeChanged:(UISegmentedControl *)sender
+{
+    [self setDisplayMode:(sender.selectedSegmentIndex == 1)];
+    [self updatePreviewContent];
+    UISelectionFeedbackGenerator *feedback = [[UISelectionFeedbackGenerator alloc] init];
+    [feedback selectionChanged];
 }
 
 - (void)viewDidLoad {
@@ -857,6 +936,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
         [_settingsButton setHidden:YES];
         [_titleLabel setHidden:YES];
         [_subtitleLabel setHidden:YES];
+        [_previewCard setHidden:YES];
         [_statusLabel setHidden:YES];
         [_statusIndicator setHidden:YES];
         [_authorLabelBottomConstraint setConstant:_gAuthorLabelBottomConstraintConstantCompact];
@@ -868,6 +948,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
         [_settingsButton setHidden:NO];
         [_titleLabel setHidden:NO];
         [_subtitleLabel setHidden:NO];
+        [_previewCard setHidden:NO];
         [_statusLabel setHidden:NO];
         [_statusIndicator setHidden:NO];
         [_authorLabelBottomConstraint setConstant:_gAuthorLabelBottomConstraintConstantRegular];

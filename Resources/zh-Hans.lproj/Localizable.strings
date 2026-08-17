@@ -97,6 +97,9 @@
 "Inactive" = "未运行";
 "HUD is active" = "悬浮窗正在运行";
 "HUD is inactive" = "悬浮窗未运行";
+"HUD Preview" = "悬浮窗预览";
+"FPS preview" = "帧率预览";
+"Network speed preview" = "网速预览";
 
 /* No comment provided by engineer. */
 "Hide @snapshot" = "截图时隐藏";
