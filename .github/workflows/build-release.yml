@@ -29,7 +29,7 @@ jobs:
           echo "/usr/local/opt/make/libexec/gnubin" >> $GITHUB_PATH
 
       - name: Checkout roothide/theos
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: roothide/theos
           path: theos
@@ -41,14 +41,14 @@ jobs:
           echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
 
       - name: Checkout theos/sdks
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: theos/sdks
           ref: master
           path: ${{ env.THEOS }}/sdks
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: TrollSpeed
           submodules: recursive

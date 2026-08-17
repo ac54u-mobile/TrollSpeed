@@ -21,7 +21,7 @@ jobs:
           xcode-version: ${{ env.XCODE_VERSION }}
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Build
         shell: bash

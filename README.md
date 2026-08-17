@@ -1,7 +1,7 @@
 # TrollSpeed
 
 [![Xcode - Build and Analyze](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/build-analyse.yml/badge.svg)](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/build-analyse.yml)
-[![Analyse Commands](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/analyse-commands.yml/badge.svg)](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/analyse-commands.yml)
+[![Theos - Build Packages](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/analyse-commands.yml/badge.svg)](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/analyse-commands.yml)
 [![Build Release](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/build-release.yml/badge.svg)](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/build-release.yml)
 ![Latest Release](https://img.shields.io/github/v/release/ac54u-mobile/TrollSpeed)
 ![MIT License](https://img.shields.io/github/license/ac54u-mobile/TrollSpeed)

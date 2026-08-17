@@ -1,4 +1,4 @@
-name: Analyse Commands
+name: Theos - Build Packages
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
           echo "/usr/local/opt/make/libexec/gnubin" >> $GITHUB_PATH
 
       - name: Checkout roothide/theos
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: roothide/theos
           path: theos
@@ -40,14 +40,14 @@ jobs:
           echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
 
       - name: Checkout theos/sdks
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: theos/sdks
           ref: master
           path: ${{ env.THEOS }}/sdks
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: TrollSpeed
           submodules: recursive
@@ -60,10 +60,9 @@ jobs:
           git fetch --tags
           echo "GIT_TAG=$(git describe --tags --always --abbrev=0)" >> $GITHUB_ENV
 
-      - name: Build compilation database
+      - name: Build packages
         run: |
           cd $GITHUB_WORKSPACE/TrollSpeed
-          ./gen-control.sh ${{ env.GIT_TAG }}
-          THEOS_PACKAGE_SCHEME=rootless gmake commands
-          gmake clean
-          gmake commands
+          ./gen-control.sh
+          THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1 gmake clean package
+          FINALPACKAGE=1 gmake clean package
