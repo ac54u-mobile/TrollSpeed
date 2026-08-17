@@ -18,7 +18,6 @@ TrollSpeed_FILES += $(wildcard sources/SPLarkController/*.swift)
 TrollSpeed_FILES += $(wildcard sources/SnapshotSafeView/*.swift)
 
 ifeq ($(THEOS_PACKAGE_SCHEME),roothide)
-TrollSpeed_FILES += libroot/dyn.c
 TrollSpeed_LIBRARIES += roothide
 endif
 
