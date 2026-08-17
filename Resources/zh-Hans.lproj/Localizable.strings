@@ -88,6 +88,16 @@
 /* No comment provided by engineer. */
 "Hide" = "隐藏";
 
+"Network speed and FPS, always in sight." = "网速与帧率，始终一目了然。";
+"Top left" = "左上方";
+"Top center" = "顶部居中";
+"Top right" = "右上方";
+"Turns the floating display on or off." = "打开或关闭悬浮显示。";
+"Active" = "运行中";
+"Inactive" = "未运行";
+"HUD is active" = "悬浮窗正在运行";
+"HUD is inactive" = "悬浮窗未运行";
+
 /* No comment provided by engineer. */
 "Hide @snapshot" = "截图时隐藏";
 

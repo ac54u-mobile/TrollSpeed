@@ -88,6 +88,16 @@
 /* No comment provided by engineer. */
 "Hide" = "Oculto";
 
+"Network speed and FPS, always in sight." = "Velocidad de red y FPS, siempre a la vista.";
+"Top left" = "Arriba a la izquierda";
+"Top center" = "Arriba al centro";
+"Top right" = "Arriba a la derecha";
+"Turns the floating display on or off." = "Activa o desactiva la pantalla flotante.";
+"Active" = "Activo";
+"Inactive" = "Inactivo";
+"HUD is active" = "El HUD está activo";
+"HUD is inactive" = "El HUD está inactivo";
+
 /* No comment provided by engineer. */
 "Hide @snapshot" = "Ocultar en capturas";
 

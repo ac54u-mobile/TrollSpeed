@@ -33,6 +33,11 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     UIButton *_topCenterButton;
     UIButton *_topCenterMostButton;
     UILabel *_authorLabel;
+    UILabel *_titleLabel;
+    UILabel *_subtitleLabel;
+    UILabel *_statusLabel;
+    UIView *_statusIndicator;
+    CAGradientLayer *_backgroundGradient;
     BOOL _supportsCenterMost;
     NSLayoutConstraint *_topLeftConstraint;
     NSLayoutConstraint *_topRightConstraint;
@@ -78,23 +83,42 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     CGRect bounds = UIScreen.mainScreen.bounds;
 
     self.view = [[UIView alloc] initWithFrame:bounds];
-    self.view.backgroundColor = [UIColor colorWithRed:0.0f / 255.0f green:0.0f / 255.0f blue:0.0f / 255.0f alpha:.580f / 1.0f];  // rgba(0, 0, 0, 0.580)
+    self.view.backgroundColor = [UIColor systemBackgroundColor];
 
     self.backgroundView = [[UIView alloc] initWithFrame:bounds];
     self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.backgroundView.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
-        if ([traitCollection userInterfaceStyle] == UIUserInterfaceStyleDark) {
-            return [UIColor colorWithRed:28/255.0 green:74/255.0 blue:82/255.0 alpha:1.0];  // rgba(28, 74, 82, 1.0)
-        } else {
-            return [UIColor colorWithRed:26/255.0 green:188/255.0 blue:156/255.0 alpha:1.0];  // rgba(26, 188, 156, 1.0)
-        }
-    }];
+    self.backgroundView.backgroundColor = [UIColor systemBackgroundColor];
     [self.view addSubview:self.backgroundView];
+
+    _backgroundGradient = [CAGradientLayer layer];
+    _backgroundGradient.startPoint = CGPointMake(0.0, 0.0);
+    _backgroundGradient.endPoint = CGPointMake(1.0, 1.0);
+    [self.backgroundView.layer insertSublayer:_backgroundGradient atIndex:0];
+
+    _titleLabel = [[UILabel alloc] init];
+    _titleLabel.text = @"TrollSpeed";
+    _titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleLargeTitle];
+    _titleLabel.adjustsFontForContentSizeCategory = YES;
+    _titleLabel.textColor = [UIColor labelColor];
+    _titleLabel.textAlignment = NSTextAlignmentCenter;
+    [_titleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.backgroundView addSubview:_titleLabel];
+
+    _subtitleLabel = [[UILabel alloc] init];
+    _subtitleLabel.text = NSLocalizedString(@"Network speed and FPS, always in sight.", nil);
+    _subtitleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    _subtitleLabel.adjustsFontForContentSizeCategory = YES;
+    _subtitleLabel.textColor = [UIColor secondaryLabelColor];
+    _subtitleLabel.textAlignment = NSTextAlignmentCenter;
+    _subtitleLabel.numberOfLines = 2;
+    [_subtitleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.backgroundView addSubview:_subtitleLabel];
 
     _topLeftButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_topLeftButton setTintColor:[UIColor whiteColor]];
     [_topLeftButton addTarget:self action:@selector(tapTopLeftButton:) forControlEvents:UIControlEventTouchUpInside];
     [_topLeftButton setImage:[UIImage systemImageNamed:@"arrow.up.left"] forState:UIControlStateNormal];
+    _topLeftButton.accessibilityLabel = NSLocalizedString(@"Top left", nil);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [_topLeftButton setAdjustsImageWhenHighlighted:NO];
@@ -112,14 +136,15 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     [NSLayoutConstraint activateConstraints:@[
         _topLeftConstraint,
         [_topLeftButton.leadingAnchor constraintEqualToAnchor:safeArea.leadingAnchor constant:20.0f],
-        [_topLeftButton.widthAnchor constraintEqualToConstant:40.0f],
-        [_topLeftButton.heightAnchor constraintEqualToConstant:40.0f],
+        [_topLeftButton.widthAnchor constraintEqualToConstant:44.0f],
+        [_topLeftButton.heightAnchor constraintEqualToConstant:44.0f],
     ]];
 
     _topRightButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_topRightButton setTintColor:[UIColor whiteColor]];
     [_topRightButton addTarget:self action:@selector(tapTopRightButton:) forControlEvents:UIControlEventTouchUpInside];
     [_topRightButton setImage:[UIImage systemImageNamed:@"arrow.up.right"] forState:UIControlStateNormal];
+    _topRightButton.accessibilityLabel = NSLocalizedString(@"Top right", nil);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [_topRightButton setAdjustsImageWhenHighlighted:NO];
@@ -136,14 +161,15 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     [NSLayoutConstraint activateConstraints:@[
         _topRightConstraint,
         [_topRightButton.trailingAnchor constraintEqualToAnchor:safeArea.trailingAnchor constant:-20.0f],
-        [_topRightButton.widthAnchor constraintEqualToConstant:40.0f],
-        [_topRightButton.heightAnchor constraintEqualToConstant:40.0f],
+        [_topRightButton.widthAnchor constraintEqualToConstant:44.0f],
+        [_topRightButton.heightAnchor constraintEqualToConstant:44.0f],
     ]];
 
     _topCenterButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_topCenterButton setTintColor:[UIColor whiteColor]];
     [_topCenterButton addTarget:self action:@selector(tapTopCenterButton:) forControlEvents:UIControlEventTouchUpInside];
     [_topCenterButton setImage:[UIImage systemImageNamed:@"arrow.up"] forState:UIControlStateNormal];
+    _topCenterButton.accessibilityLabel = NSLocalizedString(@"Top center", nil);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [_topCenterButton setAdjustsImageWhenHighlighted:NO];
@@ -160,8 +186,8 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     [NSLayoutConstraint activateConstraints:@[
         _topCenterConstraint,
         [_topCenterButton.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor],
-        [_topCenterButton.widthAnchor constraintEqualToConstant:40.0f],
-        [_topCenterButton.heightAnchor constraintEqualToConstant:40.0f],
+        [_topCenterButton.widthAnchor constraintEqualToConstant:44.0f],
+        [_topCenterButton.heightAnchor constraintEqualToConstant:44.0f],
     ]];
 
     [self reloadModeButtonState];
@@ -169,12 +195,17 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     _mainButton = [MainButton buttonWithType:UIButtonTypeSystem];
     [_mainButton setTintColor:[UIColor whiteColor]];
     [_mainButton addTarget:self action:@selector(tapMainButton:) forControlEvents:UIControlEventTouchUpInside];
+    _mainButton.layer.cornerRadius = 18.0;
+    _mainButton.layer.cornerCurve = kCACornerCurveContinuous;
+    _mainButton.clipsToBounds = YES;
+    _mainButton.titleLabel.adjustsFontForContentSizeCategory = YES;
+    _mainButton.accessibilityHint = NSLocalizedString(@"Turns the floating display on or off.", nil);
     if (@available(iOS 15.0, *))
     {
         UIButtonConfiguration *config = [UIButtonConfiguration tintedButtonConfiguration];
         [config setTitleTextAttributesTransformer:^NSDictionary <NSAttributedStringKey, id> * _Nonnull(NSDictionary <NSAttributedStringKey, id> * _Nonnull textAttributes) {
             NSMutableDictionary *newAttributes = [textAttributes mutableCopy];
-            [newAttributes setObject:[UIFont boldSystemFontOfSize:32.0] forKey:NSFontAttributeName];
+            [newAttributes setObject:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline] forKey:NSFontAttributeName];
             return newAttributes;
         }];
         [config setCornerStyle:UIButtonConfigurationCornerStyleLarge];
@@ -182,7 +213,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     }
     else
     {
-        [_mainButton.titleLabel setFont:[UIFont boldSystemFontOfSize:32.0]];
+        [_mainButton.titleLabel setFont:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline]];
     }
     [self.backgroundView addSubview:_mainButton];
 
@@ -190,12 +221,29 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     [NSLayoutConstraint activateConstraints:@[
         [_mainButton.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor],
         [_mainButton.centerYAnchor constraintEqualToAnchor:self.backgroundView.centerYAnchor],
+        [_mainButton.widthAnchor constraintGreaterThanOrEqualToConstant:240.0f],
+        [_mainButton.heightAnchor constraintGreaterThanOrEqualToConstant:64.0f],
+        [_mainButton.leadingAnchor constraintGreaterThanOrEqualToAnchor:safeArea.leadingAnchor constant:24.0f],
+        [_mainButton.trailingAnchor constraintLessThanOrEqualToAnchor:safeArea.trailingAnchor constant:-24.0f],
     ]];
+
+    _statusIndicator = [[UIView alloc] init];
+    _statusIndicator.layer.cornerRadius = 4.0;
+    [_statusIndicator setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.backgroundView addSubview:_statusIndicator];
+
+    _statusLabel = [[UILabel alloc] init];
+    _statusLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
+    _statusLabel.adjustsFontForContentSizeCategory = YES;
+    _statusLabel.textColor = [UIColor secondaryLabelColor];
+    [_statusLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.backgroundView addSubview:_statusLabel];
 
     _settingsButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_settingsButton setTintColor:[UIColor whiteColor]];
     [_settingsButton addTarget:self action:@selector(tapSettingsButton:) forControlEvents:UIControlEventTouchUpInside];
     [_settingsButton setImage:[UIImage systemImageNamed:@"gear"] forState:UIControlStateNormal];
+    _settingsButton.accessibilityLabel = NSLocalizedString(@"Settings", nil);
     [self.backgroundView addSubview:_settingsButton];
     if (@available(iOS 15.0, *))
     {
@@ -205,10 +253,23 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     }
     [_settingsButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     [NSLayoutConstraint activateConstraints:@[
+        [_titleLabel.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor],
+        [_titleLabel.bottomAnchor constraintEqualToAnchor:_subtitleLabel.topAnchor constant:-6.0f],
+        [_titleLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:safeArea.leadingAnchor constant:24.0f],
+        [_subtitleLabel.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor],
+        [_subtitleLabel.bottomAnchor constraintEqualToAnchor:_mainButton.topAnchor constant:-40.0f],
+        [_subtitleLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:safeArea.leadingAnchor constant:24.0f],
+        [_subtitleLabel.trailingAnchor constraintLessThanOrEqualToAnchor:safeArea.trailingAnchor constant:-24.0f],
+        [_statusIndicator.widthAnchor constraintEqualToConstant:8.0f],
+        [_statusIndicator.heightAnchor constraintEqualToConstant:8.0f],
+        [_statusIndicator.centerYAnchor constraintEqualToAnchor:_statusLabel.centerYAnchor],
+        [_statusIndicator.trailingAnchor constraintEqualToAnchor:_statusLabel.leadingAnchor constant:-8.0f],
+        [_statusLabel.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor constant:8.0f],
+        [_statusLabel.topAnchor constraintEqualToAnchor:_mainButton.bottomAnchor constant:16.0f],
         [_settingsButton.bottomAnchor constraintEqualToAnchor:safeArea.bottomAnchor constant:-20.0f],
         [_settingsButton.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor],
-        [_settingsButton.widthAnchor constraintEqualToConstant:40.0f],
-        [_settingsButton.heightAnchor constraintEqualToConstant:40.0f],
+        [_settingsButton.widthAnchor constraintEqualToConstant:44.0f],
+        [_settingsButton.heightAnchor constraintEqualToConstant:44.0f],
     ]];
 
     _authorLabel = [[UILabel alloc] init];
@@ -236,7 +297,44 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+    _backgroundGradient.frame = self.backgroundView.bounds;
     _supportsCenterMost = CGRectGetMinY(self.view.window.safeAreaLayoutGuide.layoutFrame) >= 51;
+}
+
+- (void)updateVisualStyle
+{
+    UIColor *topColor = [UIColor systemBackgroundColor];
+    UIColor *accentColor = [[UIColor systemTealColor] colorWithAlphaComponent:(self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? 0.28 : 0.18)];
+    _backgroundGradient.colors = @[(id)topColor.CGColor, (id)accentColor.CGColor];
+
+    NSArray<UIButton *> *positionButtons = @[_topLeftButton, _topCenterButton, _topRightButton];
+    for (UIButton *button in positionButtons) {
+        UIColor *backgroundColor = button.isSelected ? [UIColor systemTealColor] : [UIColor tertiarySystemFillColor];
+        UIColor *foregroundColor = button.isSelected ? [UIColor whiteColor] : [UIColor labelColor];
+        if (@available(iOS 15.0, *)) {
+            UIButtonConfiguration *configuration = button.configuration;
+            configuration.baseBackgroundColor = backgroundColor;
+            configuration.baseForegroundColor = foregroundColor;
+            button.configuration = configuration;
+        } else {
+            button.backgroundColor = backgroundColor;
+            button.tintColor = foregroundColor;
+        }
+        button.layer.cornerRadius = 22.0;
+        button.layer.cornerCurve = kCACornerCurveContinuous;
+    }
+
+    if (@available(iOS 15.0, *)) {
+        UIButtonConfiguration *configuration = _settingsButton.configuration;
+        configuration.baseBackgroundColor = [UIColor tertiarySystemFillColor];
+        configuration.baseForegroundColor = [UIColor labelColor];
+        _settingsButton.configuration = configuration;
+    } else {
+        _settingsButton.backgroundColor = [UIColor tertiarySystemFillColor];
+        _settingsButton.tintColor = [UIColor labelColor];
+    }
+    _settingsButton.layer.cornerRadius = 22.0;
+    _settingsButton.layer.cornerCurve = kCACornerCurveContinuous;
 }
 
 - (void)viewDidLoad {
@@ -245,6 +343,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     _impactFeedbackGenerator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleMedium];
 
     [self registerNotifications];
+    [self updateVisualStyle];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -528,7 +627,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSDictionary *defaultAttributes = @{
-            NSForegroundColorAttributeName: [UIColor whiteColor],
+            NSForegroundColorAttributeName: [UIColor secondaryLabelColor],
             NSFontAttributeName: [UIFont systemFontOfSize:14],
         };
 
@@ -537,7 +636,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
         creditsParaStyle.alignment = NSTextAlignmentCenter;
 
         NSDictionary *creditsAttributes = @{
-            NSForegroundColorAttributeName: [UIColor whiteColor],
+            NSForegroundColorAttributeName: [UIColor secondaryLabelColor],
             NSFontAttributeName: [UIFont systemFontOfSize:14],
             NSParagraphStyleAttributeName: creditsParaStyle,
         };
@@ -584,7 +683,28 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     __weak typeof(self) weakSelf = self;
     [UIView transitionWithView:self.backgroundView duration:HUD_TRANSITION_DURATION options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf->_mainButton setTitle:(strongSelf->_isRemoteHUDActive ? NSLocalizedString(@"Exit HUD", nil) : NSLocalizedString(@"Open HUD", nil)) forState:UIControlStateNormal];
+        NSString *mainTitle = strongSelf->_isRemoteHUDActive ? NSLocalizedString(@"Exit HUD", nil) : NSLocalizedString(@"Open HUD", nil);
+        UIImage *mainImage = [UIImage systemImageNamed:(strongSelf->_isRemoteHUDActive ? @"stop.fill" : @"play.fill")];
+        UIColor *mainColor = strongSelf->_isRemoteHUDActive ? [UIColor systemRedColor] : [UIColor systemTealColor];
+        if (@available(iOS 15.0, *)) {
+            UIButtonConfiguration *configuration = strongSelf->_mainButton.configuration;
+            configuration.title = mainTitle;
+            configuration.image = mainImage;
+            configuration.imagePadding = 10.0;
+            configuration.baseBackgroundColor = mainColor;
+            configuration.baseForegroundColor = [UIColor whiteColor];
+            strongSelf->_mainButton.configuration = configuration;
+        } else {
+            [strongSelf->_mainButton setTitle:mainTitle forState:UIControlStateNormal];
+            [strongSelf->_mainButton setImage:mainImage forState:UIControlStateNormal];
+            strongSelf->_mainButton.tintColor = [UIColor whiteColor];
+            strongSelf->_mainButton.backgroundColor = mainColor;
+            strongSelf->_mainButton.contentEdgeInsets = UIEdgeInsetsMake(16.0, 24.0, 16.0, 24.0);
+            strongSelf->_mainButton.titleEdgeInsets = UIEdgeInsetsMake(0.0, 10.0, 0.0, 0.0);
+        }
+        strongSelf->_mainButton.accessibilityValue = strongSelf->_isRemoteHUDActive ? NSLocalizedString(@"Active", nil) : NSLocalizedString(@"Inactive", nil);
+        strongSelf->_statusLabel.text = strongSelf->_isRemoteHUDActive ? NSLocalizedString(@"HUD is active", nil) : NSLocalizedString(@"HUD is inactive", nil);
+        strongSelf->_statusIndicator.backgroundColor = strongSelf->_isRemoteHUDActive ? [UIColor systemGreenColor] : [UIColor tertiaryLabelColor];
         [strongSelf->_authorLabel setAttributedText:(strongSelf->_isRemoteHUDActive ? hintAttributedString : creditsAttributedString)];
     } completion:nil];
 }
@@ -621,6 +741,7 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     [_topRightButton setSelected:(selectedMode == HUDPresetPositionTopRight)];
     UIImage *topCenterImage = (isCenteredMost ? [UIImage systemImageNamed:@"arrow.up.to.line"] : [UIImage systemImageNamed:@"arrow.up"]);
     [_topCenterButton setImage:topCenterImage forState:UIControlStateNormal];
+    [self updateVisualStyle];
 }
 
 - (void)tapAuthorLabel:(UITapGestureRecognizer *)sender
@@ -734,6 +855,10 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     if (verticalClass == UIUserInterfaceSizeClassCompact) {
         CGFloat topConstant = _gTopButtonConstraintsConstantCompact;
         [_settingsButton setHidden:YES];
+        [_titleLabel setHidden:YES];
+        [_subtitleLabel setHidden:YES];
+        [_statusLabel setHidden:YES];
+        [_statusIndicator setHidden:YES];
         [_authorLabelBottomConstraint setConstant:_gAuthorLabelBottomConstraintConstantCompact];
         [_topLeftConstraint setConstant:topConstant];
         [_topRightConstraint setConstant:topConstant];
@@ -741,6 +866,10 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
     } else {
         CGFloat topConstant = isPad ? _gTopButtonConstraintsConstantRegularPad : _gTopButtonConstraintsConstantRegular;
         [_settingsButton setHidden:NO];
+        [_titleLabel setHidden:NO];
+        [_subtitleLabel setHidden:NO];
+        [_statusLabel setHidden:NO];
+        [_statusIndicator setHidden:NO];
         [_authorLabelBottomConstraint setConstant:_gAuthorLabelBottomConstraintConstantRegular];
         [_topLeftConstraint setConstant:topConstant];
         [_topRightConstraint setConstant:topConstant];
@@ -750,7 +879,11 @@ static const CGFloat _gAuthorLabelBottomConstraintConstantRegular = -80.f;
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
 {
+    [super traitCollectionDidChange:previousTraitCollection];
     [self verticalSizeClassUpdated];
+    if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        [self updateVisualStyle];
+    }
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator

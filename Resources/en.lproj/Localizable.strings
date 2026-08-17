@@ -88,6 +88,16 @@
 /* No comment provided by engineer. */
 "Hide" = "Hide";
 
+"Network speed and FPS, always in sight." = "Network speed and FPS, always in sight.";
+"Top left" = "Top left";
+"Top center" = "Top center";
+"Top right" = "Top right";
+"Turns the floating display on or off." = "Turns the floating display on or off.";
+"Active" = "Active";
+"Inactive" = "Inactive";
+"HUD is active" = "HUD is active";
+"HUD is inactive" = "HUD is inactive";
+
 /* No comment provided by engineer. */
 "Hide @snapshot" = "Hide @snapshot";
 
