@@ -61,8 +61,23 @@ jobs:
           echo "GIT_TAG=$(git describe --tags --always --abbrev=0)" >> $GITHUB_ENV
 
       - name: Build packages
+        shell: bash
         run: |
+          set -o pipefail
           cd $GITHUB_WORKSPACE/TrollSpeed
           ./gen-control.sh
-          THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1 gmake clean package
-          FINALPACKAGE=1 gmake clean package
+
+          build_package() {
+            local label="$1"
+            shift
+            if ! "$@" >"${label}.log" 2>&1; then
+              tail -80 "${label}.log"
+              summary=$(tail -25 "${label}.log" | tr '\n' ' ' | sed 's/%/%25/g; s/\r/%0D/g')
+              echo "::error title=${label} package build failed::${summary}"
+              return 1
+            fi
+            tail -30 "${label}.log"
+          }
+
+          build_package rootless env THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1 gmake clean package
+          build_package rootful env FINALPACKAGE=1 gmake clean package
