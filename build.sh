@@ -1,21 +1,23 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 # This script is used to build the TrollSpeed app and create a tipa file with Xcode.
 
 # Read the version from the existing control file
-VERSION=$(./get-version.sh) || exit 1
+VERSION=$(./get-version.sh)
 
 echo "Using version: $VERSION"
 
 # Set GITHUB_WORKSPACE to home directory if not set
-if [ -z "$GITHUB_WORKSPACE" ]; then
-    GITHUB_WORKSPACE="$HOME"
+if [ -z "${GITHUB_WORKSPACE:-}" ]; then
+    GITHUB_WORKSPACE="${HOME}"
 fi
 
 # Set THEOS to the correct path
-THEOS="$GITHUB_WORKSPACE/theos-roothide"
-if [ ! -d "$THEOS" ]; then
-    THEOS="$GITHUB_WORKSPACE/theos"
+THEOS="${GITHUB_WORKSPACE}/theos-roothide"
+if [ ! -d "${THEOS}" ]; then
+    THEOS="${GITHUB_WORKSPACE}/theos"
 fi
 
 # Build using Xcode
@@ -28,18 +30,18 @@ xcodebuild clean build archive \
 -archivePath TrollSpeed \
 CODE_SIGNING_ALLOWED=NO \
 IPHONEOS_DEPLOYMENT_TARGET=16.0 \
-THEOS="$THEOS" | xcpretty
+THEOS="${THEOS}" | xcpretty
 
 chmod 0644 Resources/Info.plist
 cp supports/entitlements.plist TrollSpeed.xcarchive/Products
-cd TrollSpeed.xcarchive/Products/Applications || exit
+cd TrollSpeed.xcarchive/Products/Applications
 codesign --remove-signature TrollSpeed.app
-cd - || exit
-cd TrollSpeed.xcarchive/Products || exit
+cd - >/dev/null
+cd TrollSpeed.xcarchive/Products
 mv Applications Payload
 ldid -Sentitlements.plist Payload/TrollSpeed.app
 chmod 0644 Payload/TrollSpeed.app/Info.plist
 zip -qr TrollSpeed.tipa Payload
-cd - || exit
+cd - >/dev/null
 mkdir -p packages
-mv TrollSpeed.xcarchive/Products/TrollSpeed.tipa packages/TrollSpeed+AppIntents16_$VERSION.tipa
+mv TrollSpeed.xcarchive/Products/TrollSpeed.tipa "packages/TrollSpeed+AppIntents16_${VERSION}.tipa"

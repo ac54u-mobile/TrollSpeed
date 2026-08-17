@@ -6,6 +6,7 @@
 //
 
 #import <notify.h>
+#import <dlfcn.h>
 #import <net/if.h>
 #import <ifaddrs.h>
 #import <objc/runtime.h>
@@ -16,14 +17,6 @@
 #import "HUDRootViewController.h"
 #import "HUDBackdropLabel.h"
 #import "TrollSpeed-Swift.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-CFIndex CARenderServerGetDirtyFrameCount(void *);
-#ifdef __cplusplus
-}
-#endif
 
 #pragma mark -
 
@@ -39,6 +32,7 @@ CFIndex CARenderServerGetDirtyFrameCount(void *);
 
 static BOOL needsBaselineReset = YES;
 static BOOL needsFPSBaselineReset = YES;
+static CFTimeInterval prevFPSUpdateTime = 0;
 
 static void LaunchServicesApplicationStateChanged
 (CFNotificationCenterRef center,
@@ -437,36 +431,60 @@ static NSAttributedString *formattedAttributedString(BOOL isFocused)
     }
 }
 
-static NSAttributedString *formattedFPSAttributedString(BOOL isFocused)
+typedef CFIndex (*CARenderServerGetDirtyFrameCountFunction)(void *);
+
+static CARenderServerGetDirtyFrameCountFunction dirtyFrameCountFunction(void)
+{
+    static CARenderServerGetDirtyFrameCountFunction function = NULL;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        function = (CARenderServerGetDirtyFrameCountFunction)dlsym(RTLD_DEFAULT, "CARenderServerGetDirtyFrameCount");
+    });
+    return function;
+}
+
+static NSAttributedString *formattedFPSAttributedString(void)
 {
     @autoreleasepool
     {
-        CFIndex dirtyFrameCount = CARenderServerGetDirtyFrameCount(NULL);
+        CARenderServerGetDirtyFrameCountFunction getDirtyFrameCount = dirtyFrameCountFunction();
+        NSString *fpsString = @"FPS N/A";
+        if (getDirtyFrameCount == NULL) {
+            return [[NSAttributedString alloc] initWithString:fpsString attributes:@{
+                NSFontAttributeName: [UIFont monospacedDigitSystemFontOfSize:HUD_FONT_SIZE weight:HUD_FONT_WEIGHT]
+            }];
+        }
+
+        CFIndex dirtyFrameCount = getDirtyFrameCount(NULL);
+        CFTimeInterval updateTime = CACurrentMediaTime();
 
         if (needsFPSBaselineReset)
         {
             prevDirtyFrameCount = dirtyFrameCount;
+            prevFPSUpdateTime = updateTime;
             needsFPSBaselineReset = NO;
             shouldUpdateSpeedLabel = YES;
 
-            NSString *fpsString = @"0 FPS";
+            fpsString = @"0 FPS";
             return [[NSAttributedString alloc] initWithString:fpsString attributes:@{
                 NSFontAttributeName: [UIFont monospacedDigitSystemFontOfSize:HUD_FONT_SIZE weight:HUD_FONT_WEIGHT]
             }];
         }
 
         CFIndex frameDiff = dirtyFrameCount - prevDirtyFrameCount;
+        CFTimeInterval elapsed = updateTime - prevFPSUpdateTime;
         prevDirtyFrameCount = dirtyFrameCount;
+        prevFPSUpdateTime = updateTime;
 
         if (frameDiff < 0) frameDiff = 0;
 
-        double fps = (double)frameDiff / UPDATE_INTERVAL;
+        double fps = elapsed > 0 ? (double)frameDiff / elapsed : 0;
         double maxFPS = (double)[UIScreen mainScreen].maximumFramesPerSecond;
         if (fps > maxFPS) fps = maxFPS;
 
         shouldUpdateSpeedLabel = YES;
 
-        NSString *fpsString = [NSString stringWithFormat:@"%.0f FPS", fps];
+        fpsString = [NSString stringWithFormat:@"%.0f FPS", fps];
         NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:fpsString attributes:@{
             NSFontAttributeName: [UIFont monospacedDigitSystemFontOfSize:HUD_FONT_SIZE weight:HUD_FONT_WEIGHT]
         }];
@@ -617,6 +635,7 @@ static const CACornerMask kCornerMaskAll = kCALayerMinXMinYCorner | kCALayerMaxX
     prevOutputBytes = 0;
     needsBaselineReset = YES;
     prevDirtyFrameCount = 0;
+    prevFPSUpdateTime = 0;
     needsFPSBaselineReset = YES;
     attributedUploadPrefix = nil;
     attributedDownloadPrefix = nil;
@@ -836,7 +855,7 @@ static const CACornerMask kCornerMaskAll = kCALayerMinXMinYCorner | kCALayerMaxX
     log_debug(OS_LOG_DEFAULT, "updateSpeedLabel");
     NSAttributedString *attributedText;
     if (HUD_DISPLAY_MODE == 1) {
-        attributedText = formattedFPSAttributedString(_isFocused);
+        attributedText = formattedFPSAttributedString();
     } else {
         attributedText = formattedAttributedString(_isFocused);
     }

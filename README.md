@@ -1,10 +1,10 @@
 # TrollSpeed
 
-[![Xcode - Build and Analyze](https://github.com/Lessica/TrollSpeed/actions/workflows/build-analyse.yml/badge.svg)](https://github.com/Lessica/TrollSpeed/actions/workflows/build-analyse.yml)
-[![Analyse Commands](https://github.com/Lessica/TrollSpeed/actions/workflows/analyse-commands.yml/badge.svg)](https://github.com/Lessica/TrollSpeed/actions/workflows/analyse-commands.yml)
-[![Build Release](https://github.com/Lessica/TrollSpeed/actions/workflows/build-release.yml/badge.svg)](https://github.com/Lessica/TrollSpeed/actions/workflows/build-release.yml)
-![Latest Release](https://img.shields.io/github/v/release/Lessica/TrollSpeed)
-![MIT License](https://img.shields.io/github/license/Lessica/TrollSpeed)
+[![Xcode - Build and Analyze](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/build-analyse.yml/badge.svg)](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/build-analyse.yml)
+[![Analyse Commands](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/analyse-commands.yml/badge.svg)](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/analyse-commands.yml)
+[![Build Release](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/build-release.yml/badge.svg)](https://github.com/ac54u-mobile/TrollSpeed/actions/workflows/build-release.yml)
+![Latest Release](https://img.shields.io/github/v/release/ac54u-mobile/TrollSpeed)
+![MIT License](https://img.shields.io/github/license/ac54u-mobile/TrollSpeed)
 
 [now-on-havoc]: https://havoc.app/package/trollspeed 
 
@@ -29,6 +29,7 @@ Tested and expected to work on all iOS versions supported by opa334’s TrollSto
   - `FINALPACKAGE=1 make package`
 - You'll get a `.tipa` file in `./packages` folder.
 - Don't like **theos**? Use `./build.sh` to build with Xcode.
+- The Theos package supports iOS 14 and later. The Xcode-built `AppIntents16` package targets iOS 16 and later so it can expose App Intents.
 
 ## Caveats
 
